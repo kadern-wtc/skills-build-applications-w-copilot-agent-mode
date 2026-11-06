@@ -9,7 +9,8 @@ export function createApp() {
   app.get('/health', (_request, response) => response.json({ ok: true }));
   app.use('/api', apiRouter);
   app.use((error: Error & { status?: number }, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
-    response.status(error.status ?? 500).json({ error: error.message });
+    const status = error.status ?? (error.name === 'ValidationError' || error.name === 'CastError' ? 400 : 500);
+    response.status(status).json({ error: error.message });
   });
   return app;
 }
